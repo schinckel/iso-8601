@@ -1,11 +1,9 @@
 from distutils.core import setup
 
-description = open('README.txt').read()
-
 setup(
     name = "iso-8601",
     version = "0.1.5",
-    description = description,
+    description = "Flexible ISO 8601 parser: pass in a valid ISO 8601 string, and a datetime object will be returned.",
     url = "http://hg.schinckel.net/iso-8601/",
     author = "Matthew Schinckel",
     author_email = "matt@schinckel.net",
