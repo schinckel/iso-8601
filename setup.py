@@ -2,9 +2,9 @@ from distutils.core import setup
 
 setup(
     name = "iso-8601",
-    version = "0.1",
+    version = "0.1.1",
     description = "ISO 8601 parser",
-    url = "http://hg.schinkel.net/iso-8601/",
+    url = "http://hg.schinckel.net/iso-8601/",
     author = "Matthew Schinckel",
     author_email = "matt@schinckel.net",
     packages = [

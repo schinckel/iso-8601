@@ -43,3 +43,8 @@ The following references were used to determine supported formats:
 	* http://en.wikipedia.org/wiki/ISO_8601
 	* http://dotat.at/tmp/ISO_8601-2004_E.pdf
 
+Changelog:
+
+    0.1.1 - Helps if I spell my domain name right.
+    
+    0.1 - Initial release.
