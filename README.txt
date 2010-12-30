@@ -24,6 +24,10 @@ which is not strictly according to the specification, but is commonly used.
 
 Also supported is using an hour of 24 to mean midnight at the end of the
 day: this is converted to the python object of the next day's 00:00:00.
+Using a non-zero minute/second/fraction will raise a ValueError.
+
+A fractional value may be appended to the last component of a time part.
+Appending it elsewhere will raise a ValueError.
 
 Finally, only naive datetime objects are supported at this time. Timezones
 may not be included in the format string.
@@ -36,7 +40,7 @@ Future (in no particular order):
 	* Support repeating intervals
 	* Support week-dates
 	* Support truncated dates
-	* Support times (including truncated?)
+	* Support time only objects (including truncated?)
 
 The following references were used to determine supported formats:
 
@@ -44,7 +48,9 @@ The following references were used to determine supported formats:
 	* http://dotat.at/tmp/ISO_8601-2004_E.pdf
 
 Changelog:
-
+    
+    0.1.5 - Added support for fractional times.
+    
     0.1.1 - Helps if I spell my domain name right.
     
     0.1 - Initial release.

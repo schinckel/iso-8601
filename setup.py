@@ -1,9 +1,11 @@
 from distutils.core import setup
 
+description = open('README.txt').read()
+
 setup(
     name = "iso-8601",
-    version = "0.1.1",
-    description = "ISO 8601 parser",
+    version = "0.1.5",
+    description = description,
     url = "http://hg.schinckel.net/iso-8601/",
     author = "Matthew Schinckel",
     author_email = "matt@schinckel.net",
