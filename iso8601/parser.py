@@ -41,6 +41,9 @@ def parse(data):
     
     """
     
+    if isinstance(data, (datetime.datetime, datetime.date)):
+        return data
+    
     if 'T' not in data:
         data = data.replace(' ', 'T')
     
