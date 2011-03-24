@@ -49,6 +49,8 @@ The following references were used to determine supported formats:
 
 Changelog:
     
+	0.1.6 - Allow for a date or datetime object to be passed to parse.
+	
     0.1.5 - Added support for fractional times.
     
     0.1.1 - Helps if I spell my domain name right.
