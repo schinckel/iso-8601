@@ -32,10 +32,19 @@ Appending it elsewhere will raise a ValueError.
 Finally, only naive datetime objects are supported at this time. Timezones
 may not be included in the format string.
 
+Duration time formats of the following forms are also supported:
+
+  * P1W2DT3H4M5S
+
+Note that support for Year and Month data is not supported, as this does not
+make sense with python's timedelta object.
+
+You may, as per ISO8601, drop fields that have no value.
+
 Future (in no particular order):
 
 	* Support timezones
-	* Support durations
+	* Support durations fully
 	* Support time intervals
 	* Support repeating intervals
 	* Support week-dates
@@ -49,10 +58,12 @@ The following references were used to determine supported formats:
 
 Changelog:
     
-	0.1.6 - Allow for a date or datetime object to be passed to parse.
+    0.2a  - Initial support for duration data (excluding year/month).
+    
+    0.1.6 - Allow for a date or datetime object to be passed to parse.
 	
     0.1.5 - Added support for fractional times.
     
     0.1.1 - Helps if I spell my domain name right.
     
-    0.1 - Initial release.
+    0.1   - Initial release.

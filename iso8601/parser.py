@@ -1,4 +1,5 @@
 import datetime
+import re
 
 def parse(data):
     """
@@ -39,11 +40,35 @@ def parse(data):
         ...
     ValueError: fractional time may only apply to last component
     
+    >>> parse('P7D')
+    datetime.timedelta(7)
+    >>> parse('P14D')
+    datetime.timedelta(14)
+    >>> parse('P1DT')
+    Traceback (most recent call last):
+        ...
+    ValueError: 'P1DT' does not match ISO8601 format
+    >>> parse('P1D2H')
+    Traceback (most recent call last):
+        ...
+    ValueError: 'P1D2H' does not match ISO8601 format
+    >>> parse('P1DT2H')
+    datetime.timedelta(1, 7200)
+    >>> parse('P1Y')
+    Traceback (most recent call last):
+        ...
+    ValueError: Year and month values are not supported in python timedelta
     """
     
-    if isinstance(data, (datetime.datetime, datetime.date)):
+    if isinstance(data, (datetime.datetime, datetime.date, datetime.timedelta)):
         return data
     
+    if 'P' in data:
+        dt, duration = data.split('P')
+        if dt:
+            return parse(dt), parse_duration(duration)
+        return parse_duration(duration)
+        
     if 'T' not in data:
         data = data.replace(' ', 'T')
     
@@ -110,6 +135,35 @@ def parse(data):
         date = date + datetime.timedelta(1)
     
     return date + addition
+
+def parse_date(date):
+    pass
+
+def parse_time(time):
+    pass
+
+duration_regex = re.compile(
+    r'^((?P<years>\d+)Y)?'
+    r'((?P<months>\d+)M)?'
+    r'((?P<weeks>\d+)W)?'
+    r'((?P<days>\d+)D)?'
+    r'(T'
+    r'((?P<hours>\d+)H)?'
+    r'((?P<minutes>\d+)M)?'
+    r'((?P<seconds>\d+)S)?'
+    r')?$'
+)
+def parse_duration(duration):
+    data = duration_regex.match(duration)
+    if not data or duration[-1] == 'T':
+        raise ValueError("'P%s' does not match ISO8601 format" % duration)
+    data = {k:int(v) for k,v in data.groupdict().items() if v}
+    if 'years' in data or 'months' in data:
+        raise ValueError('Year and month values are not supported in python timedelta')
+    return datetime.timedelta(**data)
+
+def parse_interval(interval):
+    pass
 
 if __name__ == "__main__":
     import doctest
