@@ -142,8 +142,10 @@ def parse_date(date):
 def parse_time(time):
     pass
 
+# TODO Allow least significant to be a float.
 duration_regex = re.compile(
-    r'^((?P<years>\d+)Y)?'
+    r'^P?'
+    r'((?P<years>\d+)Y)?'
     r'((?P<months>\d+)M)?'
     r'((?P<weeks>\d+)W)?'
     r'((?P<days>\d+)D)?'
@@ -153,11 +155,15 @@ duration_regex = re.compile(
     r'((?P<seconds>\d+)S)?'
     r')?$'
 )
-def parse_duration(duration):
+
+def duration_parts(duration):
     data = duration_regex.match(duration)
     if not data or duration[-1] == 'T':
         raise ValueError("'P%s' does not match ISO8601 format" % duration)
-    data = {k:int(v) for k,v in data.groupdict().items() if v}
+    return {k:int(v) for k,v in data.groupdict().items() if v and int(v)}
+
+def parse_duration(duration):
+    data = duration_parts(duration)
     if 'years' in data or 'months' in data:
         raise ValueError('Year and month values are not supported in python timedelta')
     return datetime.timedelta(**data)

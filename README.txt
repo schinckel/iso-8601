@@ -59,6 +59,7 @@ The following references were used to determine supported formats:
 Changelog:
     
     0.2a  - Initial support for duration data (excluding year/month).
+          - Initial support for formatting objects.
     
     0.1.6 - Allow for a date or datetime object to be passed to parse.
 	
