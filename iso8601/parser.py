@@ -160,7 +160,7 @@ def duration_parts(duration):
     data = duration_regex.match(duration)
     if not data or duration[-1] == 'T':
         raise ValueError("'P%s' does not match ISO8601 format" % duration)
-    return {k:int(v) for k,v in data.groupdict().items() if v and int(v)}
+    return dict([(k,int(v)) for k,v in data.groupdict().items() if v and int(v)])
 
 def parse_duration(duration):
     data = duration_parts(duration)
