@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name = "iso-8601",
-    version = "0.2a3",
+    version = "0.2.1",
     description = "Flexible ISO 8601 parser: pass in a valid ISO 8601 string, and a datetime object will be returned.",
     url = "http://hg.schinckel.net/iso-8601/",
     author = "Matthew Schinckel",
