@@ -136,11 +136,26 @@ def parse(data):
     
     return date + addition
 
+DATE_REGEX = r'(?P<year>\d{4})-(?P<month>\d\d)-(?P<day>\d\d)'
+
 def parse_date(date):
-    pass
+    """
+    >>> parse_date('2012-01-01')
+    datetime.date(2012, 1, 1)
+    >>> parse_date('2012-02-03T09:00:00')
+    datetime.date(2012, 2, 3)
+    """
+    result = parse(date)
+    if hasattr(result, 'date'):
+        return result.date()
+    return result
 
 def parse_time(time):
-    pass
+    result = parse(date)
+    if hasattr(result, 'time'):
+        return result.time()
+    return result
+
 
 # TODO Allow least significant to be a float.
 duration_regex = re.compile(

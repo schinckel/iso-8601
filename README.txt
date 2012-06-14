@@ -58,6 +58,8 @@ The following references were used to determine supported formats:
 
 Changelog:
     
+    0.2.2 - Add methods for forcing return of a date (or time): parse_date()
+    
     0.2.1 - Initial support for duration data (excluding year/month).
           - Initial support for formatting objects.
     
