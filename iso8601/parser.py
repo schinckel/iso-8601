@@ -1,5 +1,16 @@
 import datetime
 import re
+import pytz
+
+PARSED_CLASSES = (datetime.date,datetime.timedelta,)
+
+
+try:
+    import freezegun
+except ImportError:
+    pass
+else:
+    PARSED_CLASSES = PARSED_CLASSES + (freezegun.api.FakeDate,)
 
 def parse(data):
     """
@@ -58,9 +69,13 @@ def parse(data):
     Traceback (most recent call last):
         ...
     ValueError: Year and month values are not supported in python timedelta
+    
+    >>> parse('2012-02-03T09:00:00Z')
+    datetime.datetime(2012, 02, 03, 9, 0, tzinfo=<StaticTzInfo 'GMT'>)
+    
     """
     
-    if isinstance(data, (datetime.datetime, datetime.date, datetime.timedelta)):
+    if isinstance(data, PARSED_CLASSES):
         return data
     
     if 'P' in data:
@@ -82,7 +97,20 @@ def parse(data):
     if 'T' not in data:
         return datetime.datetime.strptime(data, DATE)
     
-    time = data.split('T')[1].replace(',', '.')
+    if data[-1] == "Z":
+        data = data.replace('Z', "+0000")
+    
+    if '+' in data:
+        TIMEZONE = "%z"
+        tzpart = data.split('+')[1]
+        if len(tzpart) == 2:
+            data += '00'
+        if tzpart[2] and len(tzpart) == 5:
+            data = data.replace(tzpart, tzpart.replace(':', ''))
+    else:
+        TIMEZONE = ""
+    
+    time = data.split('T')[1].replace(',', '.').split('+')[0]
     fraction = 0
     
     if time.count('.') > 1:
@@ -129,10 +157,15 @@ def parse(data):
     else:
         add_day = False
         
-    date = datetime.datetime.strptime(data.split('.')[0], DATE + 'T' + TIME)
+    date = datetime.datetime.strptime(data.split('+')[0].split('.')[0], DATE + 'T' + TIME)
     
     if add_day:
         date = date + datetime.timedelta(1)
+    
+    if TIMEZONE:
+        if tzpart != '0000':
+            raise ValueError("Unable to parse non-GMT values at this stage")
+        date = date.replace(tzinfo=pytz.UTC)
     
     return date + addition
 
