@@ -57,18 +57,20 @@ The following references were used to determine supported formats:
 	* http://dotat.at/tmp/ISO_8601-2004_E.pdf
 
 Changelog:
-    
+
+    0.3.0 - Make work for Python3
+
     0.2.3 - Added parse_date to module exports.
-    
+
     0.2.2 - Add methods for forcing return of a date (or time): parse_date()
-    
+
     0.2.1 - Initial support for duration data (excluding year/month).
           - Initial support for formatting objects.
-    
+
     0.1.6 - Allow for a date or datetime object to be passed to parse.
-	
+
     0.1.5 - Added support for fractional times.
-    
+
     0.1.1 - Helps if I spell my domain name right.
-    
+
     0.1   - Initial release.
