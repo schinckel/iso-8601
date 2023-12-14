@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "iso-8601"
+version = "0.3.1"
+description = "Flexible ISO 8601 parser: pass in a valid ISO 8601 string, and a datetime object will be returned."
+authors = ["Matthew Schinckel <matt@schinckel.net>"]
+license = "BSD License"
+readme = "README.md"
+packages = [{include = "iso8601"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+pytz = "==2023.3"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+twine = "*"
+pytest = "*"
+bump-my-version = "*"
+
+[tool.bumpversion]
+current_version = "0.3.0"
+commit = true
+tag = true
+message = "Version updated from {current_version} to {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "iso8601/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
