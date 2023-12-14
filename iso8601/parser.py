@@ -171,7 +171,7 @@ def parse(data):
         date = date + datetime.timedelta(1)
 
     if TIMEZONE:
-        if tzpart != '0000':
+        if tzpart not in ('0000', '00:00'):
             raise ValueError("Unable to parse non-GMT values at this stage")
         date = date.replace(tzinfo=pytz.UTC)
 
