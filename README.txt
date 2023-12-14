@@ -58,6 +58,8 @@ The following references were used to determine supported formats:
 
 Changelog:
 
+    0.3.1 - Support +00:00 as well as +0000 for UTC
+
     0.3.0 - Make work for Python3
 
     0.2.3 - Added parse_date to module exports.
