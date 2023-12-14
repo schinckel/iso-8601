@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import re
 import pytz
@@ -18,6 +19,19 @@ INVALID_FLOAT_MESSAGES = [
     'could not convert string to float',
 ]
 
+
+FORMATS = [
+    '%Y-%m-%dT%H:%M:%S%z',
+    '%Y-%m-%dT%H:%M:%S%Z',
+    '%Y-%m-%dT%H:%M:%S',
+    '%Y-%m-%dT%H:%M',
+    '%Y-%m-%dT%H',
+    '%Y-%m-%d',
+    '%Y%m%d',
+    '%Y%m%dT%H%M%S%z',
+    '%Y%m%dT%H%M%S%Z',
+    '%Y%m%dT%H%M%S',
+]
 
 def parse(data):
     """
@@ -78,8 +92,10 @@ def parse(data):
     ValueError: Year and month values are not supported in python timedelta
 
     >>> parse('2012-02-03T09:00:00Z')
-    datetime.datetime(2012, 2, 3, 9, 0, tzinfo=<UTC>)
+    datetime.datetime(2012, 2, 3, 9, 0, tzinfo=datetime.timezone.utc)
 
+    >>> parse('2023-11-28T06:15:00-06:00')
+    datetime.datetime(2023, 11, 28, 6, 15, tzinfo=datetime.timezone(datetime.timedelta(days=-1, seconds=64800)))
     """
 
     if isinstance(data, PARSED_CLASSES):
@@ -94,88 +110,37 @@ def parse(data):
     if 'T' not in data:
         data = data.replace(' ', 'T')
 
-    if '-' not in data.split('T')[0]:
-        basic = True
-        DATE = "%Y%m%d"
-    else:
-        basic = False
-        DATE = "%Y-%m-%d"
+    for format in FORMATS:
+        with contextlib.suppress(ValueError):
+            return datetime.datetime.strptime(data, format)
 
-    if 'T' not in data:
-        return datetime.datetime.strptime(data, DATE)
+    date_part, time_part = data.split('T')
 
-    if data[-1] == "Z":
-        data = data.replace('Z', "+0000")
+    if time_part.startswith('24'):
+        result = parse(data.replace('T24', 'T00')) + datetime.timedelta(1)
+        if result.minute or result.second or result.microsecond:
+            raise ValueError('hour=24 is only permitted at midnight')
+        return result
 
-    if '+' in data:
-        TIMEZONE = "%z"
-        tzpart = data.split('+')[1]
-        if len(tzpart) == 2:
-            data += '00'
-        if tzpart[2] and len(tzpart) == 5:
-            data = data.replace(tzpart, tzpart.replace(':', ''))
-    else:
-        TIMEZONE = ""
-
-    time = data.split('T')[1].replace(',', '.').split('+')[0]
-    fraction = 0
-
-    if time.count('.') > 1:
+    if time_part.count('.') > 1:
         raise ValueError('fractional time may only apply to last component')
-    if time.count('.'):
+    if time_part.count('.'):
         try:
-            fraction = float("0.%s" % time.split('.')[1])
+            fraction = float("0.%s" % time_part.split('.')[1])
         except ValueError as arg:
             message = arg.args[0].split(':')[0]
             if message in INVALID_FLOAT_MESSAGES:
                 raise ValueError("fractional time may only apply to last component")
             raise
 
-    time = time.split('.')[0]
+        if time_part.count(':') == 0:
+            fraction = datetime.timedelta(hours=fraction)
+        elif time_part.count(':') == 1:
+            fraction = datetime.timedelta(minutes=fraction)
+        elif time_part.count(':') == 2:
+            fraction = datetime.timedelta(seconds=fraction)
 
-    if basic:
-        chars = len(time)
-        if chars == 2:
-            TIME = "%H"
-        elif chars == 4:
-            TIME = "%H%M"
-        elif chars == 6:
-            TIME = "%H%M%S"
-    else:
-        if time.count(':') == 0:
-            TIME = "%H"
-        elif time.count(':') == 1:
-            TIME = "%H:%M"
-        elif time.count(':') == 2:
-            TIME = "%H:%M:%S"
-
-    if "%S" in TIME:
-        addition = datetime.timedelta(seconds=fraction)
-    elif "%M" in TIME:
-        addition = datetime.timedelta(minutes=fraction)
-    elif "%H" in TIME:
-        addition = datetime.timedelta(hours=fraction)
-
-    if time.startswith('24'):
-        no_hours = time[2:].replace(':', '')
-        if (no_hours != '' and int(no_hours) != 0) or addition:
-            raise ValueError('hour=24 is only permitted at midnight')
-        data = data.replace('T24', 'T00')
-        add_day = True
-    else:
-        add_day = False
-
-    date = datetime.datetime.strptime(data.split('+')[0].split('.')[0], DATE + 'T' + TIME)
-
-    if add_day:
-        date = date + datetime.timedelta(1)
-
-    if TIMEZONE:
-        if tzpart != '0000':
-            raise ValueError("Unable to parse non-GMT values at this stage")
-        date = date.replace(tzinfo=pytz.UTC)
-
-    return date + addition
+        return parse(data.split('.')[0]) + fraction
 
 
 DATE_REGEX = r'(?P<year>\d{4})-(?P<month>\d\d)-(?P<day>\d\d)'
